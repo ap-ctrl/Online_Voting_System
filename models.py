@@ -153,31 +153,14 @@ def login_voter(username, password):
 
 
 # -------- ADMIN --------
-def register_admin(username, password):
-    conn = get_connection()
-    cursor = conn.cursor()
-
-    try:
-        cursor.execute(
-            "INSERT INTO admin (username, password) VALUES (?, ?)",
-            (username, password)
-        )
-        conn.commit()
-        return "Success"
-    except:
-        return "Admin already exists"
-
-
 def login_admin(username, password):
-    conn = get_connection()
-    cursor = conn.cursor()
+    ADMIN_USERNAME = "admin"
+    ADMIN_PASSWORD = "voteradmin123"
 
-    cursor.execute(
-        "SELECT * FROM admin WHERE username=? AND password=?",
-        (username, password)
-    )
-
-    return cursor.fetchone()
+    if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
+        return True
+    else:
+        return None
 
 
 # -------- CANDIDATE --------

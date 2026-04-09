@@ -15,14 +15,7 @@ CREATE TABLE IF NOT EXISTS voters (
 )
 """)
 
-# Admin
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS admin (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT UNIQUE,
-    password TEXT
-)
-""")
+
 
 # Candidates
 cursor.execute("""
