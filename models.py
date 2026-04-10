@@ -1,121 +1,3 @@
-# from database import get_connection
-
-# # -------- VOTER --------
-# def register_voter(name, age, username, password):
-#     conn = get_connection()
-#     cursor = conn.cursor()
-
-#     if age < 18:
-#         return "Underage"
-
-#     try:
-#         cursor.execute(
-#             "INSERT INTO voters (name, age, username, password) VALUES (?, ?, ?, ?)",
-#             (name, age, username, password)
-#         )
-#         conn.commit()
-#         return "Success"
-#     except:
-#         return "Username exists"
-
-
-# def login_voter(username, password):
-#     conn = get_connection()
-#     cursor = conn.cursor()
-
-#     cursor.execute(
-#         "SELECT * FROM voters WHERE username=? AND password=?",
-#         (username, password)
-#     )
-
-#     return cursor.fetchone()
-
-
-# # -------- ADMIN --------
-# def register_admin(username, password):
-#     conn = get_connection()
-#     cursor = conn.cursor()
-
-#     try:
-#         cursor.execute(
-#             "INSERT INTO admin (username, password) VALUES (?, ?)",
-#             (username, password)
-#         )
-#         conn.commit()
-#         return "Success"
-#     except:
-#         return "Admin exists"
-
-
-# def login_admin(username, password):
-#     conn = get_connection()
-#     cursor = conn.cursor()
-
-#     cursor.execute(
-#         "SELECT * FROM admin WHERE username=? AND password=?",
-#         (username, password)
-#     )
-
-#     return cursor.fetchone()
-
-
-# # -------- CANDIDATE --------
-# def add_candidate(name, party):
-#     conn = get_connection()
-#     cursor = conn.cursor()
-
-#     cursor.execute(
-#         "INSERT INTO candidates (name, party) VALUES (?, ?)",
-#         (name, party)
-#     )
-#     conn.commit()
-
-
-# def get_candidates():
-#     conn = get_connection()
-#     cursor = conn.cursor()
-
-#     cursor.execute("SELECT * FROM candidates")
-#     return cursor.fetchall()
-
-
-# # -------- VOTING --------
-# def cast_vote(voter_id, candidate_id):
-#     conn = get_connection()
-#     cursor = conn.cursor()
-
-#     cursor.execute("SELECT has_voted FROM voters WHERE id=?", (voter_id,))
-#     if cursor.fetchone()[0] == 1:
-#         return "Already voted"
-
-#     cursor.execute(
-#         "INSERT INTO votes (voter_id, candidate_id) VALUES (?, ?)",
-#         (voter_id, candidate_id)
-#     )
-
-#     cursor.execute(
-#         "UPDATE voters SET has_voted=1 WHERE id=?",
-#         (voter_id,)
-#     )
-
-#     conn.commit()
-#     return "Success"
-
-
-# # -------- RESULTS --------
-# def get_results():
-#     conn = get_connection()
-#     cursor = conn.cursor()
-
-#     cursor.execute("""
-#     SELECT candidates.name, COUNT(votes.id)
-#     FROM candidates
-#     LEFT JOIN votes ON candidates.id = votes.candidate_id
-#     GROUP BY candidates.name
-#     """)
-
-#     return cursor.fetchall()
-
 from database import get_connection
 
 # -------- VOTER --------
@@ -270,3 +152,18 @@ def get_voters():
 
     cursor.execute("SELECT id, name, age, username, has_voted FROM voters")
     return cursor.fetchall()
+
+
+# -------- NEW FEATURE --------
+def get_user_vote(voter_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    SELECT candidates.name
+    FROM votes
+    JOIN candidates ON votes.candidate_id = candidates.id
+    WHERE votes.voter_id=?
+    """, (voter_id,))
+
+    return cursor.fetchone()
