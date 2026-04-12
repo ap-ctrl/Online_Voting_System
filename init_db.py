@@ -1,58 +1,59 @@
-from database import get_connection
+from database import get_db_connection
 
-conn = get_connection()
-cursor = conn.cursor()
+def initialize_database():
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
 
-# Voters
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS voters (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT,
-    age INTEGER,
-    username TEXT UNIQUE,
-    password TEXT,
-    has_voted INTEGER DEFAULT 0
-)
-""")
+        # Voters
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS voters (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            age INTEGER,
+            username TEXT UNIQUE,
+            password TEXT,
+            security_question TEXT,
+            security_answer TEXT,
+            has_voted INTEGER DEFAULT 0
+        )
+        """)
 
+        # Candidates
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS candidates (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            party TEXT
+        )
+        """)
 
+        # Votes
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS votes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            voter_id INTEGER,
+            candidate_id INTEGER
+        )
+        """)
 
-# Candidates
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS candidates (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT,
-    party TEXT
-)
-""")
+        # System Control
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS system_control (
+            id INTEGER PRIMARY KEY,
+            voting_open INTEGER
+        )
+        """)
 
-# Votes
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS votes (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    voter_id INTEGER,
-    candidate_id INTEGER
-)
-""")
+        cursor.execute("""
+        INSERT OR IGNORE INTO system_control (id, voting_open)
+        VALUES (1, 1)
+        """)
 
-# System Control (⚠️ THIS MUST BE BEFORE CLOSE)
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS system_control (
-    id INTEGER PRIMARY KEY,
-    voting_open INTEGER
-)
-""")
+        conn.commit()
+        print("DB Ready")
 
-cursor.execute("""
-INSERT OR IGNORE INTO system_control (id, voting_open)
-VALUES (1, 1)
-""")
-
-# ✅ CLOSE ONLY AT END
-conn.commit()
-conn.close()
-
-print("DB Ready")
+if __name__ == "__main__":
+    initialize_database()
 # from database import get_connection
 
 # conn = get_connection()
@@ -70,14 +71,7 @@ print("DB Ready")
 # )
 # """)
 
-# # Admin
-# cursor.execute("""
-# CREATE TABLE IF NOT EXISTS admin (
-#     id INTEGER PRIMARY KEY AUTOINCREMENT,
-#     username TEXT UNIQUE,
-#     password TEXT
-# )
-# """)
+
 
 # # Candidates
 # cursor.execute("""
@@ -97,12 +91,7 @@ print("DB Ready")
 # )
 # """)
 
-# conn.commit()
-# conn.close()
-
-# print("DB Ready")
-
-# # System control (for voting status)
+# # System Control (⚠️ THIS MUST BE BEFORE CLOSE)
 # cursor.execute("""
 # CREATE TABLE IF NOT EXISTS system_control (
 #     id INTEGER PRIMARY KEY,
@@ -110,8 +99,75 @@ print("DB Ready")
 # )
 # """)
 
-# # Insert default (voting open)
 # cursor.execute("""
 # INSERT OR IGNORE INTO system_control (id, voting_open)
 # VALUES (1, 1)
 # """)
+
+# # ✅ CLOSE ONLY AT END
+# conn.commit()
+# conn.close()
+
+# print("DB Ready")
+# # from database import get_connection
+
+# # conn = get_connection()
+# # cursor = conn.cursor()
+
+# # # Voters
+# # cursor.execute("""
+# # CREATE TABLE IF NOT EXISTS voters (
+# #     id INTEGER PRIMARY KEY AUTOINCREMENT,
+# #     name TEXT,
+# #     age INTEGER,
+# #     username TEXT UNIQUE,
+# #     password TEXT,
+# #     has_voted INTEGER DEFAULT 0
+# # )
+# # """)
+
+# # # Admin
+# # cursor.execute("""
+# # CREATE TABLE IF NOT EXISTS admin (
+# #     id INTEGER PRIMARY KEY AUTOINCREMENT,
+# #     username TEXT UNIQUE,
+# #     password TEXT
+# # )
+# # """)
+
+# # # Candidates
+# # cursor.execute("""
+# # CREATE TABLE IF NOT EXISTS candidates (
+# #     id INTEGER PRIMARY KEY AUTOINCREMENT,
+# #     name TEXT,
+# #     party TEXT
+# # )
+# # """)
+
+# # # Votes
+# # cursor.execute("""
+# # CREATE TABLE IF NOT EXISTS votes (
+# #     id INTEGER PRIMARY KEY AUTOINCREMENT,
+# #     voter_id INTEGER,
+# #     candidate_id INTEGER
+# # )
+# # """)
+
+# # conn.commit()
+# # conn.close()
+
+# # print("DB Ready")
+
+# # # System control (for voting status)
+# # cursor.execute("""
+# # CREATE TABLE IF NOT EXISTS system_control (
+# #     id INTEGER PRIMARY KEY,
+# #     voting_open INTEGER
+# # )
+# # """)
+
+# # # Insert default (voting open)
+# # cursor.execute("""
+# # INSERT OR IGNORE INTO system_control (id, voting_open)
+# # VALUES (1, 1)
+# # """)
